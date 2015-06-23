@@ -1,12 +1,13 @@
+{-# LANGUAGE ConstraintKinds  #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE ConstraintKinds #-}
 -- | This module handles the script store
 
-module Store where
+module Store (FileStore, getStore, addRaw, raws) where
 
 import           Control.Monad
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
+import           Control.Monad.Reader
 import           Control.Monad.Reader.Class
 import           Data.ByteString.Lazy       (fromStrict, toStrict)
 import           Data.FileStore
@@ -14,11 +15,12 @@ import           Data.Text                  (Text)
 import qualified Data.Text.Encoding         as T
 import           System.FilePath
 
--- store :: FileStore
--- store = gitFileStore "geb_store" --TODO configuration
-
--- TODO copy the API of filestore with MonadStore ?
 type MonadStore m = (MonadReader FileStore m, MonadIO m, MonadCatch m)
+
+getStore :: FilePath -> IO FileStore
+getStore f = do let store = gitFileStore f
+                runReaderT initializeStore store
+                return store
 
 initializeStore :: MonadStore m => m ()
 initializeStore = do store <- ask
