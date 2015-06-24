@@ -14,39 +14,35 @@ import           Data.Text                  (Text)
 import qualified Data.Text.Encoding         as T
 import           System.FilePath
 
-type MonadStore m = (MonadReader FileStore m, MonadIO m, MonadCatch m)
 
 getStore :: FilePath -> IO FileStore
 getStore f = do let store = gitFileStore f
-                runReaderT initializeStore store
+                initializeStore store
                 return store
 
-initializeStore :: MonadStore m => m ()
-initializeStore = do store <- ask
-                     catchConst RepositoryExists
-                                (liftIO $ initialize store)
-                                (return ())
+initializeStore :: FileStore -> IO ()
+initializeStore store = catchConst RepositoryExists
+                                   (initialize store)
+                                   (return ())
 
 data Raw = Raw
   { rawName    :: String
   , rawContent :: Text
   } deriving Show
 
-addRaw :: MonadStore m => Raw -> m ()
-addRaw raw  = do store <- ask
-                 liftIO $ create store path defaultAuthor description (rawContent raw)
+addRaw :: FileStore -> Raw -> IO ()
+addRaw store raw  = create store path defaultAuthor description (rawContent raw)
   where path = "raw" </> rawName raw
         description = "Added file " ++ rawName raw
 
-raws :: MonadStore m => m [Raw]
-raws = do store <- ask
-          allInRaw <- catchConst NotFound
-                                 (liftIO $ directory store "raw")
-                                 (return [])
-          let rawFiles = map toFilePath allInRaw
-          liftIO $ forM rawFiles $ \f ->
-               do content <- retrieve store ("raw" </> f) Nothing
-                  return (Raw f content)
+raws :: FileStore -> IO [Raw]
+raws store = do allInRaw <- catchConst NotFound
+                                       (directory store "raw")
+                                       (return [])
+                let rawFiles = map toFilePath allInRaw
+                forM rawFiles $ \f ->
+                     do content <- retrieve store ("raw" </> f) Nothing
+                        return (Raw f content)
 
   where toFilePath (FSFile f) = f
         toFilePath (FSDirectory f) = error ("Unexpected directory in raw: " ++ f)

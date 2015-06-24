@@ -17,4 +17,5 @@ storeTests = testGroup "Store"
   ]
 
 
+withTempDir :: (FilePath -> IO a) -> IO a
 withTempDir = withSystemTempDirectory "geb_test_XXX"
