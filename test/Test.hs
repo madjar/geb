@@ -1,11 +1,7 @@
 module Main where
 
+import Geb.StoreTest
+
 import Test.Tasty
-import Test.Tasty.HUnit
 
-main = defaultMain tests
-
-tests = testGroup "test test"
-  [ testCase "stupid test case" $
-      2 @?= 2
-  ]
+main = defaultMain storeTests
