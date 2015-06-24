@@ -2,9 +2,9 @@
 module Geb.Web where
 
 import           Geb.Store
+import           Geb.Store.Raw
 
 import           Control.Monad.IO.Class
-import           Control.Monad.Reader
 import           Data.Monoid
 import qualified Data.Text              as T
 import           Web.Spock.Safe
