@@ -2,13 +2,12 @@
 {-# LANGUAGE FlexibleContexts #-}
 -- | This module handles the script store
 
-module Store (FileStore, getStore, addRaw, raws) where
+module Geb.Store (FileStore, getStore, addRaw, raws) where
 
 import           Control.Monad
 import           Control.Monad.Catch
 import           Control.Monad.IO.Class
 import           Control.Monad.Reader
-import           Control.Monad.Reader.Class
 import           Data.ByteString.Lazy       (fromStrict, toStrict)
 import           Data.FileStore
 import           Data.Text                  (Text)

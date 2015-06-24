@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Main where
+module Geb.Web where
 
-import           Store
+import           Geb.Store
 
 import           Control.Monad.IO.Class
 import           Control.Monad.Reader
@@ -11,8 +11,8 @@ import           Web.Spock.Safe
 
 type Spock = SpockT (ReaderT FileStore IO)
 
-main :: IO ()
-main =
+runGeb :: IO ()
+runGeb =
   do store <- getStore "jmt_store"
      runSpock 3000 $ spockT (\m -> runReaderT m store) website
 
