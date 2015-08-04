@@ -2,5 +2,5 @@ flags: {}
 packages:
 - '.'
 extra-deps:
-- filestore-0.6.0.6
-resolver: nightly-2015-06-21
+- filestore-0.6.1
+resolver: nightly-2015-07-30
