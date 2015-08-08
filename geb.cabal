@@ -16,17 +16,19 @@ library
   exposed-modules:     Geb.Web
                      , Geb.Store
                      , Geb.Store.Raw
+                     , Geb.Store.Script
   other-modules:       Geb.Utils
-  build-depends:       base >= 4.7 && < 5
-                     , Spock
-                     , filestore
-                     , text
+  build-depends:       aeson
+                     , base >= 4.7 && < 5
                      , bytestring
-                     , filepath
-                     , transformers
-                     , mtl
                      , exceptions
-                     , lucid
+                     , filepath
+                     , filestore
+                     , mtl
+                     , text
+                     , transformers
+                     , yesod
+                     , blaze-html
   default-language:    Haskell2010
                      
 executable geb
