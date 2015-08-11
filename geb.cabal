@@ -17,6 +17,7 @@ library
                      , Geb.Store
                      , Geb.Store.Raw
                      , Geb.Store.Script
+                     , Geb.Subtitles
   other-modules:       Geb.Utils
   build-depends:       aeson
                      , base >= 4.7 && < 5
@@ -29,6 +30,10 @@ library
                      , transformers
                      , yesod
                      , blaze-html
+                     , attoparsec
+                     , subtitleParser
+                     , either
+                     , classy-prelude
   default-language:    Haskell2010
                      
 executable geb

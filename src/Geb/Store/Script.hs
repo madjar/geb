@@ -3,13 +3,13 @@
 module Geb.Store.Script where
 
 import Geb.Store.Raw
+import Geb.Subtitles
 
 import Data.Text (Text)
 import Data.FileStore
 import Data.Aeson
 import Data.Aeson.TH
 import System.FilePath
-import Data.ByteString.Lazy (ByteString)
 
 data Script = Script
   { scriptName :: FilePath
@@ -26,10 +26,7 @@ instance Contents Script where
 
 convertRaw :: FileStore -> FilePath -> IO Script
 convertRaw store r = do raw <- getRaw store r
-                        let lines = parseScript (rawContent raw)
+                        let lines = parseSubtitles (rawContent raw)
                             script = Script r lines
                         save store ("scripts" </> r) defaultAuthor "plop" script
                         return script
-
-parseScript :: ByteString -> [Text]
-parseScript = undefined
