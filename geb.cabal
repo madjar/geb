@@ -33,7 +33,7 @@ library
                      , attoparsec
                      , subtitleParser
                      , either
-                     , classy-prelude
+                     , basic-prelude
   default-language:    Haskell2010
                      
 executable geb

@@ -2,7 +2,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 module Geb.Subtitles where
 
-import ClassyPrelude
+import BasicPrelude
 
 import Text.Subtitles.SRT
 import Data.Attoparsec.Text.Lazy
