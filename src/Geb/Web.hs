@@ -4,6 +4,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE ViewPatterns      #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 module Geb.Web where
 
 import           Geb.Store
@@ -15,17 +16,21 @@ import Yesod
 import System.FilePath
 import qualified Data.FileStore as FS
 import Text.Blaze.Html
-
+import Data.Text (Text)
 
 data App = App
   { store :: FileStore
   }
 
 mkYesod "App" [parseRoutes|
-/             HomeR   GET
-/script/#FilePath ScriptR GET
+/                 HomeR     GET
+/submit/          SubmitR   GET POST
+/script/#FilePath ScriptR   GET
 |]
 instance Yesod App
+
+instance RenderMessage App FormMessage where
+    renderMessage _ _ = defaultFormMessage
 
 getHomeR :: Handler Html
 getHomeR = do App {..} <- getYesod
@@ -51,6 +56,26 @@ getScriptR path = do App {..} <- getYesod
                                    $forall line <- scriptLines script
                                      <li>#{line}
                              |]
+type Form a = Html -> MForm Handler (FormResult a, Widget)
+submitForm :: Form (Text, FileInfo)
+submitForm = renderDivs $ (,)
+    <$> areq textField "Title" Nothing
+    <*> fileAFormReq "File"
+
+getSubmitR :: Handler Html
+getSubmitR = do
+  ((res, widget), enctype) <- runFormPost submitForm
+  case res of
+    FormSuccess (title, fileInfo) -> redirect HomeR
+    _ -> defaultLayout
+           [whamlet|
+             <form method=post action=@{SubmitR} enctype=#{enctype}>
+               ^{widget}
+               <input type=submit>
+           |]
+
+postSubmitR :: Handler Html
+postSubmitR = getSubmitR
 
 runGeb :: IO ()
 runGeb =
