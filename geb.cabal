@@ -34,6 +34,7 @@ library
                      , subtitleParser
                      , either
                      , basic-prelude
+                     , conduit-combinators
   default-language:    Haskell2010
                      
 executable geb

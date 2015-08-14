@@ -13,10 +13,12 @@ import Geb.Store.Script
 import Geb.Utils
 
 import Yesod
+import Conduit
 import System.FilePath
 import qualified Data.FileStore as FS
 import Text.Blaze.Html
 import Data.Text (Text)
+import qualified Data.Text as T
 
 data App = App
   { store :: FileStore
@@ -47,7 +49,7 @@ getHomeR = do App {..} <- getYesod
 getScriptR :: FilePath -> Handler Html
 getScriptR path = do App {..} <- getYesod
                      script <- liftIO $ catchConst FS.NotFound
-                                                   (FS.retrieve store ("script" </> path) Nothing)
+                                                   (FS.retrieve store ("scripts" </> path) Nothing)
                                                    (convertRaw store path)
                      defaultLayout $ do
                              setTitle (toHtml ("Script for " ++ path))
@@ -56,6 +58,7 @@ getScriptR path = do App {..} <- getYesod
                                    $forall line <- scriptLines script
                                      <li>#{line}
                              |]
+
 type Form a = Html -> MForm Handler (FormResult a, Widget)
 submitForm :: Form (Text, FileInfo)
 submitForm = renderDivs $ (,)
@@ -66,7 +69,13 @@ getSubmitR :: Handler Html
 getSubmitR = do
   ((res, widget), enctype) <- runFormPost submitForm
   case res of
-    FormSuccess (title, fileInfo) -> redirect HomeR
+    FormSuccess (title, fileInfo) ->
+      do App {..} <- getYesod
+         let name = T.unpack (fileName fileInfo)
+         content <- fileSource fileInfo $$ sinkLazy
+         liftIO $ addRaw store (Raw name content)
+         liftIO $ convertRaw store name
+         redirect (ScriptR name)
     _ -> defaultLayout
            [whamlet|
              <form method=post action=@{SubmitR} enctype=#{enctype}>
